@@ -28,7 +28,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     token_raul_bello = myFile.read().split("\n")[1]
 
     myFile.close()
-    if update.effective_chat.id.__eq__(token_raul_bello):
+    if update.effective_chat.id == (int(token_raul_bello)):
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Raúl eres bien tonto"
         )

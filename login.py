@@ -27,7 +27,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Hola, soy el bot de Racama, si quieres "
-        "interactuar conmigo usa los siguientes comandos: /start,/caps\n",
+        "interactuar conmigo usa los siguientes comandos: /start,/caps y para responder un acertijo usa /quiz\n",
     )
 
 
@@ -61,15 +61,15 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Sends a message with three inline buttons attached."""
     keyboard = [
         [
-            InlineKeyboardButton("Option 1", callback_data="1"),
-            InlineKeyboardButton("Option 2", callback_data="2"),
+            InlineKeyboardButton("El suelo", callback_data="1"),
+            InlineKeyboardButton("El jabón", callback_data="2"),
         ],
-        [InlineKeyboardButton("Option 3", callback_data="3")],
+        [InlineKeyboardButton("Me da igual", callback_data="3")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+    await update.message.reply_text("Si se te cae el jabón al suelo, ¿está el suelo limpio o el jabón sucio?:", reply_markup=reply_markup)
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
@@ -77,8 +77,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # CallbackQueries need to be answered, even if no notification to the user is needed
     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     await query.answer()
-
-    await query.edit_message_text(text=f"Selected option: {query.data}")
+    if query.data=="1":
+        await query.edit_message_text(text=f"Puede ser")
+    elif query.data=="2":
+        await query.edit_message_text(text=f"Bien pensado")
+    else:
+        await query.edit_message_text(text=f"Hay que ser bien maricón")
 
 async def inline_caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
@@ -114,7 +118,7 @@ if __name__ == "__main__":
     echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
     caps_handler = CommandHandler("caps", caps)
     start_handler = CommandHandler("start", start)
-    buttons_handler = CommandHandler("buttons", buttons)
+    buttons_handler = CommandHandler("quiz", buttons)
     button_handler = CallbackQueryHandler(button)
     #Add handlers to application
     application.add_handler(start_handler)

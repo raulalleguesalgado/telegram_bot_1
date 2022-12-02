@@ -8,15 +8,16 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     ContextTypes,
-    CallbackQueryHandler
+    CallbackQueryHandler,
 )
 from telegram import InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import InlineQueryHandler
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 token_raul = os.environ.get("bot_token")
-token_raul_bello=os.environ.get("raul_bello")
+token_raul_bello = os.environ.get("raul_bello")
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -57,6 +58,7 @@ async def caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text_caps = " ".join(context.args).upper()
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
 
+
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Sends a message with three inline buttons attached."""
     keyboard = [
@@ -69,7 +71,42 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text("Si se te cae el jabón al suelo, ¿está el suelo limpio o el jabón sucio?:", reply_markup=reply_markup)
+    await update.message.reply_text(
+        "Si se te cae el jabón al suelo, ¿está el suelo limpio o el jabón sucio?:",
+        reply_markup=reply_markup,
+    )
+
+
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Sends a message with three inline buttons attached."""
+    keyboard = [
+        [
+            InlineKeyboardButton("Carne", callback_data="4"),
+            InlineKeyboardButton("Pescado", callback_data="5"),
+        ],
+        [InlineKeyboardButton("Cerrar", callback_data="6")],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text("Qué quieres comer?:", reply_markup=reply_markup)
+
+
+async def menu_carne(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Sends a message with three inline buttons attached."""
+    keyboard = [
+        [
+            InlineKeyboardButton("Cerdo", callback_data="7"),
+            InlineKeyboardButton("Pollo", callback_data="8"),
+        ],
+        [InlineKeyboardButton("Atrás", callback_data="9")],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text("Qué tipo de cane?:", reply_markup=reply_markup)
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
@@ -77,12 +114,23 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # CallbackQueries need to be answered, even if no notification to the user is needed
     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     await query.answer()
-    if query.data=="1":
+    if query.data == "1":
         await query.edit_message_text(text=f"Puede ser")
-    elif query.data=="2":
+    elif query.data == "2":
         await query.edit_message_text(text=f"Bien pensado")
-    else:
+    elif query.data == "3":
         await query.edit_message_text(text=f"Hay que ser bien maricón")
+    elif query.data == "4":
+        print("Carne")
+    # Display menu_carne
+
+    elif query.data == "5":
+        print("Pescado")
+        # Display menu_pescado
+    elif query.data == "6":
+        print("Atras")
+        # Goback
+
 
 async def inline_caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
@@ -108,24 +156,21 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
 
-
-
-
-
-
     application = ApplicationBuilder().token(token_raul).build()
-    #initialize handlers
+    # initialize handlers
     echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
     caps_handler = CommandHandler("caps", caps)
     start_handler = CommandHandler("start", start)
     buttons_handler = CommandHandler("quiz", buttons)
     button_handler = CallbackQueryHandler(button)
-    #Add handlers to application
+    menu_hanlder = CommandHandler("menu", menu)
+    # Add handlers to application
     application.add_handler(start_handler)
     application.add_handler(echo_handler)
     application.add_handler(caps_handler)
     application.add_handler(buttons_handler)
     application.add_handler(button_handler)
+    application.add_handler(menu_hanlder)
 
     inline_caps_handler = InlineQueryHandler(inline_caps)
     application.add_handler(inline_caps_handler)
